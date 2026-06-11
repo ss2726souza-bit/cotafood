@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>CotaFood - Sistema de Cotações para Food Service</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+    <link rel="icon" type="image/png" href="logo.jpeg">
+</head>
+<body>
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>
+                <i data-lucide="utensils-crossed"></i>
+                <span>CotaFood</span>
+            </h2>
+            <p>Food Service</p>
+        </div>
+
+        <nav class="menu">
+            <button class="menu-item active" onclick="mostrarSecao('dashboard', this)">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </button>
+
+            <button class="menu-item" onclick="mostrarSecao('cotacao', this)">
+                <i data-lucide="file-text"></i>
+                <span>Nova Cotação</span>
+            </button>
+
+            <button class="menu-item" onclick="mostrarSecao('cotacaoCompra', this)">
+                <i data-lucide="shopping-cart"></i>
+                <span>Cotação de Compra</span>
+            </button>
+
+            <button class="menu-item" onclick="mostrarSecao('historico', this)">
+                <i data-lucide="history"></i>
+                <span>Histórico</span>
+            </button>
+
+            <button class="menu-item" onclick="mostrarSecao('produtos', this)">
+                <i data-lucide="package"></i>
+                <span>Produtos</span>
+            </button>
+
+            <button class="menu-item" onclick="mostrarSecao('relatorios', this)">
+                <i data-lucide="bar-chart-3"></i>
+                <span>Relatórios</span>
+            </button>
+
+            <button class="menu-item" onclick="mostrarSecao('admin', this)">
+                <i data-lucide="settings"></i>
+                <span>Administração</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <small>© 2026 CotaFood</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <section id="dashboard" class="secao ativa">
+            <h1><i data-lucide="layout-dashboard"></i> Dashboard</h1>
+            <p class="subtitulo">Visão geral do sistema.</p>
+
+            <div class="cards">
+                <div class="card">
+                    <span class="card-label">Cotações salvas</span>
+                    <strong id="totalCotacoes">0</strong>
+                </div>
+                <div class="card">
+                    <span class="card-label">Clientes atendidos</span>
+                    <strong id="totalClientes">0</strong>
+                </div>
+                <div class="card">
+                    <span class="card-label">Status</span>
+                    <strong id="statusSistema">Online</strong>
+                </div>
+            </div>
+        </section>
+
+        <section id="cotacao" class="secao">
+            <h1><i data-lucide="file-text"></i> Nova Cotação</h1>
+
+            <div class="cotacao-layout">
+                <div class="panel-card painel-esquerdo">
+                    <div class="row-inputs row-inputs-3">
+                        <div class="input-group">
+                            <label>Cliente</label>
+                            <input type="text" id="nomeClienteInput" placeholder="Nome do cliente...">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Vendedor</label>
+                            <input type="text" id="nomeVendedorInput" placeholder="Seu nome...">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Validade (dias)</label>
+                            <input type="number" id="validadeCotacaoInput" min="1" value="7">
+                        </div>
+                    </div>
+
+                    <div class="input-group autocomplete-container">
+                        <label>Buscar Produto</label>
+                        <input
+                            type="text"
+                            id="inputBuscaProduto"
+                            placeholder="Digite o nome ou código do produto..."
+                            autocomplete="off"
+                        >
+                        <ul id="lista-busca"></ul>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Códigos dos Produtos</label>
+                        <textarea id="codigosInput" placeholder="Cole os códigos aqui (um por linha ou separados por espaço)..."></textarea>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="buscarProdutos()">
+                            <i data-lucide="search"></i>
+                            <span>Gerar Tabela</span>
+                        </button>
+
+                        <button class="btn-secondary" onclick="limparTudo()">
+                            <i data-lucide="eraser"></i>
+                            <span>Limpar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-card painel-direito">
+                    <div class="input-group">
+                        <label>Margem Global</label>
+                        <div class="margem-row">
+                            <input type="number" id="globalFator" step="0.01" value="1.50">
+                            <button class="btn-primary" onclick="aplicarGlobal()">
+                                <i data-lucide="check"></i>
+                                <span>Aplicar</span>
+                            </button>
+                        </div>
+                        <p class="texto-ajuda">Aplica o fator em todos os itens da tabela abaixo.</p>
+                    </div>
+
+                    <div class="bloco-exportar">
+                        <label>Exportar</label>
+                        <div class="btn-group vertical">
+                            <button class="btn-success" onclick="exportarImagem()">
+                                <i data-lucide="image"></i>
+                                <span>WhatsApp</span>
+                            </button>
+
+                            <button class="btn-pdf" onclick="exportarPDF()">
+                                <i data-lucide="file-down"></i>
+                                <span>PDF</span>
+                            </button>
+
+                            <button class="btn-save" onclick="salvarCotacao()">
+                                <i data-lucide="save"></i>
+                                <span>Salvar no Histórico</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="areaCotacao" class="area-cotacao">
+                <div id="printHeader" class="print-header">
+                    <div class="print-header-topo">
+                        <img src="logo.jpeg" alt="Logo da empresa" class="print-logo" onerror="this.style.display='none'">
+
+                        <div class="print-empresa">
+                            <h2 id="printEmpresaNome">CotaFood</h2>
+                            <p id="printEmpresaEndereco">Av. Quatorze de Dezembro, 2846 - Vila Rami, Jundiaí - SP</p>
+                            <p id="printEmpresaTelefone">(11) 2152-6600</p>
+                            <p id="printEmpresaInstagram">@ferperezalimentos | @ferperezburger</p>
+                        </div>
+                    </div>
+
+                    <div class="print-meta">
+                        <div class="print-meta-item"><strong>Cotação Nº:</strong> <span id="printNumero">------</span></div>
+                        <div class="print-meta-item"><strong>Cliente:</strong> <span id="printCliente">-</span></div>
+                        <div class="print-meta-item"><strong>Vendedor:</strong> <span id="printVendedor">-</span></div>
+                        <div class="print-meta-item"><strong>Data:</strong> <span id="printData">-</span></div>
+                        <div class="print-meta-item"><strong>Validade:</strong> <span id="printValidade">7 dias</span></div>
+                    </div>
+                </div>
+
+                <table id="tabelaCotacao">
+                    <thead>
+                        <tr>
+                            <th>CÓD</th>
+                            <th>DESCRIÇÃO</th>
+                            <th class="coluna-privada">CUSTO</th>
+                            <th class="coluna-privada">P1</th>
+                            <th class="coluna-privada">P2</th>
+                            <th class="coluna-privada">P3</th>
+                            <th class="coluna-privada">P4</th>
+                            <th class="coluna-privada">P5</th>
+                            <th class="coluna-privada">FATOR</th>
+                            <th>PREÇO FINAL</th>
+                            <th class="coluna-privada"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="cotacaoCompra" class="secao">
+            <h1><i data-lucide="shopping-cart"></i> Cotação de Compra</h1>
+            <p class="subtitulo">Monte uma solicitação de cotação para enviar ao fornecedor.</p>
+
+            <div class="cotacao-layout">
+                <div class="panel-card painel-esquerdo">
+                    <div class="row-inputs row-inputs-3">
+                        <div class="input-group">
+                            <label>Fornecedor</label>
+                            <input type="text" id="compraFornecedorInput" placeholder="Nome do fornecedor...">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Solicitante</label>
+                            <input type="text" id="compraSolicitanteInput" placeholder="Seu nome...">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Prazo de Resposta (dias)</label>
+                            <input type="number" id="compraPrazoInput" min="1" value="2">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Observações Gerais</label>
+                        <textarea id="compraObservacoesGerais" placeholder="Ex.: Favor informar disponibilidade, prazo de entrega e condições comerciais."></textarea>
+                    </div>
+                </div>
+
+                <div class="panel-card painel-direito">
+                    <div class="input-group">
+                        <label>Adicionar Item</label>
+
+                        <div class="input-group">
+                            <input type="text" id="compraProdutoInput" placeholder="Produto">
+                        </div>
+
+                        <div class="row-inputs">
+                            <div class="input-group">
+                                <input type="text" id="compraMarcaInput" placeholder="Marca desejada">
+                            </div>
+
+                            <div class="input-group">
+                                <input type="number" id="compraQuantidadeInput" placeholder="Quantidade" min="1">
+                            </div>
+                        </div>
+
+                        <div class="row-inputs row-inputs-3">
+                            <div class="input-group">
+                                <input type="text" id="compraUnidadeInput" placeholder="Unidade (KG, CX, UN...)">
+                            </div>
+
+                            <div class="input-group">
+                                <input type="text" id="compraGramaturaInput" placeholder="Gramatura">
+                            </div>
+
+                            <div class="input-group">
+                                <select id="compraSimilarInput">
+                                    <option value="Sim">Aceita similar? Sim</option>
+                                    <option value="Não">Aceita similar? Não</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="compraObsItemInput" placeholder="Observação do item">
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn-primary" onclick="adicionarItemCompra()">
+                                <i data-lucide="plus"></i>
+                                <span>Adicionar Item</span>
+                            </button>
+
+                            <button class="btn-secondary" onclick="limparCamposItemCompra()">
+                                <i data-lucide="eraser"></i>
+                                <span>Limpar Campos</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="areaCompra" class="area-cotacao">
+                <div id="printHeaderCompra" class="print-header">
+                    <div class="print-header-topo">
+                        <img src="logo.jpeg" alt="Logo da empresa" class="print-logo" onerror="this.style.display='none'">
+
+                        <div class="print-empresa">
+                            <h2 id="printCompraEmpresaNome">CotaFood</h2>
+                            <p id="printCompraEmpresaEndereco">Av. Quatorze de Dezembro, 2846 - Vila Rami, Jundiaí - SP</p>
+                            <p id="printCompraEmpresaTelefone">(11) 2152-6600</p>
+                            <p id="printCompraEmpresaInstagram">@ferperezalimentos | @ferperezburger</p>
+                        </div>
+                    </div>
+
+                    <div class="print-meta">
+                        <div class="print-meta-item"><strong>Fornecedor:</strong> <span id="printCompraFornecedor">-</span></div>
+                        <div class="print-meta-item"><strong>Solicitante:</strong> <span id="printCompraSolicitante">-</span></div>
+                        <div class="print-meta-item"><strong>Data:</strong> <span id="printCompraData">-</span></div>
+                        <div class="print-meta-item"><strong>Prazo:</strong> <span id="printCompraPrazo">-</span></div>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                        <p id="printCompraObservacoes" class="subtitulo" style="margin-bottom:0;">-</p>
+                    </div>
+                </div>
+
+                <table id="tabelaCompra">
+                    <thead>
+                        <tr>
+                            <th>PRODUTO</th>
+                            <th>MARCA</th>
+                            <th>QTD</th>
+                            <th>UNIDADE</th>
+                            <th>GRAMATURA</th>
+                            <th>OBSERVAÇÕES</th>
+                            <th>ACEITA SIMILAR?</th>
+                            <th class="coluna-compra-acao">AÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="btn-group" style="margin-top:18px;">
+                    <button class="btn-success" onclick="exportarImagemCompra()">
+                        <i data-lucide="image"></i>
+                        <span>Exportar WhatsApp</span>
+                    </button>
+
+                    <button class="btn-pdf" onclick="exportarPDFCompra()">
+                        <i data-lucide="file-down"></i>
+                        <span>Exportar PDF</span>
+                    </button>
+
+                    <button class="btn-excel" onclick="exportarExcelCompra()">
+                        <i data-lucide="sheet"></i>
+                        <span>Exportar Excel</span>
+                    </button>
+
+                    <button class="btn-secondary" onclick="limparCotacaoCompra()">
+                        <i data-lucide="trash-2"></i>
+                        <span>Limpar Lista</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="historico" class="secao">
+            <div class="secao-topo">
+                <h1><i data-lucide="history"></i> Histórico</h1>
+                <button class="btn-primary" onclick="carregarHistorico()">
+                    <i data-lucide="refresh-cw"></i>
+                    <span>Atualizar</span>
+                </button>
+            </div>
+            <div id="listaHistorico"></div>
+        </section>
+
+        <section id="produtos" class="secao">
+            <h1><i data-lucide="package"></i> Produtos</h1>
+            <p class="subtitulo">Consulte rapidamente a base utilizando a busca da Nova Cotação. Depois podemos transformar esta área em um cadastro completo.</p>
+        </section>
+
+        <section id="relatorios" class="secao">
+            <h1><i data-lucide="bar-chart-3"></i> Relatórios</h1>
+            <p class="subtitulo">Em breve podemos incluir ranking de produtos mais cotados, clientes, vendedores e margens médias.</p>
+        </section>
+
+        <section id="admin" class="secao">
+            <h1><i data-lucide="settings"></i> Administração</h1>
+
+            <div class="admin-box">
+                <div class="input-group">
+                    <label>Senha de administrador</label>
+                    <input type="password" id="inputSenhaAdmin" placeholder="Digite a senha de administrador">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="verificarSenha()">
+                        <i data-lucide="shield-check"></i>
+                        <span>Entrar</span>
+                    </button>
+                </div>
+
+                <p id="msgSenha"></p>
+
+                <div id="adminArquivoWrap" style="display:none; margin-top:16px;">
+                    <div class="input-group">
+                        <label>Importar base CSV</label>
+                        <input type="file" id="fileInput" accept=".csv">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="uploadPlanilha()">
+                            <i data-lucide="upload"></i>
+                            <span>Importar CSV</span>
+                        </button>
+                    </div>
+
+                    <hr style="margin:24px 0; border:none; border-top:1px solid #e5e7eb;">
+
+                    <h2 style="margin-bottom:16px; font-size:22px;">Dados da Empresa</h2>
+
+                    <div class="input-group">
+                        <label>Nome da empresa</label>
+                        <input type="text" id="empresaNome">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Endereço</label>
+                        <input type="text" id="empresaEndereco">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Telefone</label>
+                        <input type="text" id="empresaTelefone">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Instagram / observação</label>
+                        <input type="text" id="empresaInstagram">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Validade padrão da cotação (dias)</label>
+                        <input type="number" id="empresaValidade" min="1" value="7">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="salvarConfiguracoesEmpresa()">
+                            <i data-lucide="save"></i>
+                            <span>Salvar dados da empresa</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>

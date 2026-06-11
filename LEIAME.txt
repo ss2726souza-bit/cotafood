@@ -1,0 +1,62 @@
+===================================================================
+          MANUAL DO SISTEMA DE COTAÇÃO - FERPEREZ ALIMENTOS
+===================================================================
+Desenvolvido por: Diego Souza
+Versão: 1.0
+
+1. O QUE É O SISTEMA?
+---------------------
+É uma aplicação web local para agilizar a criação de cotações de preços.
+Ele permite importar a tabela de preços da empresa, calcular margens
+automaticamente, gerar imagens para WhatsApp/PDF e manter um histórico
+de todas as negociações.
+
+2. REQUISITOS PARA RODAR
+------------------------
+- Computador com Windows.
+- Node.js instalado (Versão 12 ou superior).
+- Navegador Google Chrome ou Edge.
+
+3. ESTRUTURA DE ARQUIVOS
+------------------------
+/sistema-cotacao
+  |-- /public
+  |     |-- index.html   (A tela do sistema/visual)
+  |     |-- logo.png     (O logo da empresa)
+  |-- server.js          (O cérebro/servidor)
+  |-- distribuidora.db   (O banco de dados com histórico e produtos)
+  |-- package.json       (Lista de dependências)
+  |-- iniciar.bat        (Atalho para abrir o sistema)
+
+4. COMO USAR NO DIA A DIA
+-------------------------
+Passo 1: Dê dois cliques no arquivo "iniciar.bat".
+Passo 2: O navegador abrirá automaticamente no endereço http://localhost:3000.
+Passo 3: Se precisar atualizar os preços:
+    - Clique em "ADMIN: Atualizar Base".
+    - Escolha o arquivo CSV atualizado.
+    - Clique em Importar.
+Passo 4: Para Cotar:
+    - Preencha o nome do Cliente e Vendedor.
+    - Cole os códigos dos produtos (um por linha ou separados por espaço).
+    - Clique em "Gerar Tabela".
+    - Ajuste a Margem Global ou o Preço Final individualmente.
+Passo 5: Finalizar:
+    - Clique em "WhatsApp" ou "PDF" para enviar ao cliente.
+    - Clique em "Salvar Cotação" para guardar no Histórico.
+
+5. MODELO DA PLANILHA (CSV)
+---------------------------
+Para a importação funcionar, o Excel deve ser salvo como "CSV (separado por ponto e vírgula)".
+A primeira linha (cabeçalho) deve conter nomes parecidos com estes:
+
+| produto | ult. custo | preco 01 | preco 02 | preco 03 | preco 04 | preco 05 |
+
+*Obs: A coluna "produto" deve conter o código e o nome juntos (Ex: "100 - FARINHA").
+O sistema separa automaticamente o que vem antes do hífen como código.
+
+6. SOLUÇÃO DE PROBLEMAS
+-----------------------
+- "Erro de conexão": Verifique se a janela preta (terminal) foi fechada. Ela precisa ficar aberta.
+- "Produto não encontrado": Verifique se o código está correto na planilha e se foi feito o upload recente.
+- "Logo não aparece": Garanta que existe um arquivo chamado 'logo.png' na pasta 'public'.

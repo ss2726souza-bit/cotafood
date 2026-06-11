@@ -1,0 +1,53 @@
+{
+  "name": "cotafood",
+  "version": "1.0.0",
+  "description": "CotaFood - Sistema de cotações inteligentes para o food service",
+  "main": "main.js",
+  "scripts": {
+    "start": "node server.js",
+    "electron": "electron .",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "author": "Diego Souza",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.1",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "express": "^5.2.1",
+    "multer": "^2.0.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0"
+  },
+  "build": {
+    "appId": "com.cotafood.app",
+    "productName": "CotaFood",
+    "copyright": "Copyright © Diego Souza",
+    "win": {
+      "target": "nsis",
+      "icon": "icone.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CotaFood"
+    },
+    "files": [
+      "main.js",
+      "server.js",
+      "package.json",
+      "public/**/*",
+      "node_modules/**/*",
+      "icone.png"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  }
+}
