@@ -7,7 +7,7 @@
     "start": "node server.js",
     "electron": "electron .",
     "dist": "electron-builder",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder"
   },
   "author": "Diego Souza",
   "license": "ISC",
