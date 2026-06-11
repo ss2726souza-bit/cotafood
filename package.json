@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "electron": "electron .",
-    "dist": "electron-builder",
-    "postinstall": "electron-builder"
+    "dist": "electron-builder"
   },
   "author": "Diego Souza",
   "license": "ISC",
